@@ -1,0 +1,35 @@
+/* Optional: Makes the sample page fill the window. */
+html, body, .container-fluid, .row{
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#map{
+  height: 100%;
+}
+
+.label{
+  margin: 1px;
+}
+
+.inline-btn {
+    position: absolute;
+    bottom: 10px;
+    right: 25px;
+    cursor: pointer;
+}
+
+#add-incident-btn{
+    margin: 17px;
+}
+
+#test{
+    background-color: #002b36;
+}
+
+
+.gm-style-iw div *{
+    padding-bottom: 4px;
+    overflow: hidden;
+}
