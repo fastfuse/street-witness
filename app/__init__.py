@@ -1,20 +1,20 @@
 
 import os
-import pymongo
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 from flask_admin import Admin
 
 
 app = Flask(__name__)
 
+# app.config.from_object('config.DevelopmentConfig')
+
+app.config.from_object(os.environ['APP_SETTINGS'])
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
 admin = Admin(app)
-
-app.config.from_object('config.DevelopmentConfig')
-
-# pymongo db instance
-client = pymongo.MongoClient()
-db = client['street-witness']
-
 
 
 from app import views
+from app import models
