@@ -8,80 +8,7 @@ var GoogleMap = React.createClass({
     }
   },
 
-//   componentWillReceiveProps: function(nextProps){
-//     var mapOptions = {center: {lat: this.props.centerLat,
-//                                lng: this.props.centerLng},
-//                       zoom: this.props.initialZoom,
-//                       mapTypeControl: false
-//     },
-
-//     map = new google.maps.Map(document.getElementById('map'), mapOptions)
-
-//     var btnContainer = document.createElement('div')
-//     btnContainer.id = 'btn-container-div'
-
-//     var btn = $('<button class="btn btn-info" id="add-incident-btn" \
-//                          title="Додати інцидент" data-toggle="modal" \
-//                          data-target="#add-incident-modal">Додати інцидент</button>')
-
-//     btnContainer.appendChild(btn[0])
-
-//     map.controls[google.maps.ControlPosition.TOP_RIGHT].push(btnContainer);
-
-//     $.getJSON("static/js/map-styles.json", function(data){
-//         map.setOptions({styles: data})
-//     })
-
-//     // console.log(nextProps.incidents)
-
-//     nextProps.incidents.forEach(function(item){
-//       console.log(item)
-//       var marker = new google.maps.Marker({
-//         // position: item.location,
-//         position: JSON.parse(item.location),
-//         map: map,
-//         title: item.title
-//       })
-
-
-//       // var content = '<h3 class="text-success">' + item.title + '</h3>'
-//       // var content = <div>
-//       // <h4>Title</h4>
-//       // <p>descr</p>
-//       // <span class="label label-default">{incident.tag}</span>
-//       // <p></p>
-//       // </div>
-
-//       // var content = '<div><h4 class="text-info">' + item.title + '</h4>' +
-//       //               '<pre>' + item.description + '</pre>' +
-//       //               '<span class="label label-info">' + item.tag + '</span>' +
-//       //               '<p>' + new Date(item.date.$date).toLocaleString() + '</p></div>'
-
-//       var content = '<div id="content"><h4 class="text-info">' + item.title + '</h4>' +
-//                     '<p>' + new Date(item.date.$date).toLocaleString() + '</p>' +
-//                     '<pre>' + item.description + '</pre>' +
-//                     '<span class="label label-info">' + item.tag + '</span></div>'
-
-//       var infowindow = new google.maps.InfoWindow()
-
-//       google.maps.event.addListener(marker, 'click', (function(marker,content,infowindow){
-//               return function(){
-//                  infowindow.setContent(content)
-//                  infowindow.open(map,marker)
-//               }
-//           })(marker,content,infowindow))
-
-
-
-
-//       return marker
-//     })
-
-// },
-
-
-
-  componentDidMount: function(){
+  componentWillReceiveProps: function(nextProps){
     var mapOptions = {center: {lat: this.props.centerLat,
                                lng: this.props.centerLng},
                       zoom: this.props.initialZoom,
@@ -105,7 +32,77 @@ var GoogleMap = React.createClass({
         map.setOptions({styles: data})
     })
 
+    // console.log(nextProps.incidents)
+
+    nextProps.incidents.forEach(function(item){
+      // console.log(item)
+      var marker = new google.maps.Marker({
+        position: item.location,
+        // position: JSON.parse(item.location),
+        map: map,
+        title: item.title
+      })
+
+
+      // var content = '<h3 class="text-success">' + item.title + '</h3>'
+      // var content = <div>
+      // <h4>Title</h4>
+      // <p>descr</p>
+      // <span class="label label-default">{incident.tag}</span>
+      // <p></p>
+      // </div>
+
+      // var content = '<div><h4 class="text-info">' + item.title + '</h4>' +
+      //               '<pre>' + item.description + '</pre>' +
+      //               '<span class="label label-info">' + item.tag + '</span>' +
+      //               '<p>' + new Date(item.date.$date).toLocaleString() + '</p></div>'
+
+      var content = '<div id="content"><h4 class="text-info">' + item.title + '</h4>' +
+                    '<p>' + new Date(item.timestamp) + '</p>' +
+                    '<pre>' + item.description + '</pre>' +
+                    '<span class="label label-info">' + item.tag + '</span></div>'
+
+      var infowindow = new google.maps.InfoWindow()
+
+      google.maps.event.addListener(marker, 'click', (function(marker,content,infowindow){
+              return function(){
+                 infowindow.setContent(content)
+                 infowindow.open(map,marker)
+              }
+          })(marker,content,infowindow))
+
+      return marker
+    })
+
 },
+
+
+
+//   componentDidMount: function(){
+//     var mapOptions = {center: {lat: this.props.centerLat,
+//                                lng: this.props.centerLng},
+//                       zoom: this.props.initialZoom,
+//                       mapTypeControl: false
+//     },
+
+//     map = new google.maps.Map(document.getElementById('map'), mapOptions)
+
+//     var btnContainer = document.createElement('div')
+//     btnContainer.id = 'btn-container-div'
+
+//     var btn = $('<button class="btn btn-info" id="add-incident-btn" \
+//                          title="Додати інцидент" data-toggle="modal" \
+//                          data-target="#add-incident-modal">Додати інцидент</button>')
+
+//     btnContainer.appendChild(btn[0])
+
+//     map.controls[google.maps.ControlPosition.TOP_RIGHT].push(btnContainer);
+
+//     $.getJSON("static/js/map-styles.json", function(data){
+//         map.setOptions({styles: data})
+//     })
+
+// },
 
 
 
@@ -296,7 +293,8 @@ var App = React.createClass({
   },
 
   fetchIncidents: function(){
-    var url = 'http://127.0.0.1:5000/api/incidents?status=active'
+    // var url = 'http://127.0.0.1:5000/api/incidents?status=active'
+    var url = 'http://127.0.0.1:5000/api/incidents/?status=active'
     var incidents
 
     $.ajax({
@@ -306,7 +304,7 @@ var App = React.createClass({
       success: function(data){
         // console.log(data)
         this.setState({
-          incidents: data.data
+          incidents: data.incidents
         })
       }.bind(this),
 
@@ -316,9 +314,9 @@ var App = React.createClass({
     })
   },
 
-  // componentDidMount: function(){
-  //   this.fetchIncidents()
-  // },
+  componentDidMount: function(){
+    this.fetchIncidents()
+  },
 
   render: function(){
     // console.log(this.state)
