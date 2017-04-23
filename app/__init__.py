@@ -7,8 +7,6 @@ from flask_admin import Admin
 
 app = Flask(__name__)
 
-# app.config.from_object('config.DevelopmentConfig')
-
 app.config.from_object(os.environ['APP_SETTINGS'])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
