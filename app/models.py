@@ -1,5 +1,6 @@
 
-from app import db
+import jwt
+from app import db, bcrypt, app
 from sqlalchemy.dialects.postgresql import JSON
 from datetime import datetime, timedelta
 
@@ -27,3 +28,58 @@ class Incident(db.Model):
     def __repr__(self):
         return '<Incident obj. Title: {}>'.format(self.title)
 
+
+class User(db.Model):
+    """ User Model for storing user related details """
+    __tablename__ = "users"
+
+    id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
+    username = db.Column('title', db.Unicode, unique=True)
+    password = db.Column('password', db.String(255), nullable=False)
+    registered_on = db.Column('registered_on', db.DateTime, nullable=False)
+    admin = db.Column('admin' ,db.Boolean, nullable=False, default=False)
+
+    def __init__(self, username, password, admin=False):
+        self.username = username
+        self.password = bcrypt.generate_password_hash(password).decode()
+        self.registered_on = datetime.now().replace(microsecond=0) + \
+                                                             timedelta(hours=3)
+        self.admin = admin
+
+    def __repr__(self):
+        return '<User obj. Username: {}>'.format(self.username)
+
+    def encode_auth_token(self, user_id):
+        """
+        Generates the Auth Token
+        :return: string
+        """
+        try:
+            payload = {
+                'exp': datetime.utcnow() + timedelta(days=0, seconds=5),
+                'iat': datetime.utcnow(),
+                'sub': user_id
+            }
+            return jwt.encode(
+                payload,
+                app.config.get('SECRET_KEY'),
+                algorithm='HS256'
+            )
+
+        except Exception as e:
+            return e
+
+    @staticmethod
+    def decode_auth_token(auth_token):
+        """
+        Decodes the auth token
+        :param auth_token:
+        :return: integer|string
+        """
+        try:
+            payload = jwt.decode(auth_token, app.config.get('SECRET_KEY'))
+            return payload['sub']
+        except jwt.ExpiredSignatureError:
+            return 'Signature expired. Please log in again.'
+        except jwt.InvalidTokenError:
+            return 'Invalid token. Please log in again.'
