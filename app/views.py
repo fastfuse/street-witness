@@ -35,6 +35,12 @@ def register_api(view, endpoint, url, pk='id', pk_type='any'):
 Response = namedtuple('Response', ['status', 'message'])
 
 
+@app.errorhandler(404)
+def not_found(error):
+    """ RESTful 404 error """
+    return make_response(jsonify({'error': 'Not found'}), 404)
+
+
 # ============================   Admin views   ================================
 
 class IncidentsView(ModelView):
