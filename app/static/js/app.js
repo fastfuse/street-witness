@@ -294,8 +294,8 @@ var App = React.createClass({
   },
 
   fetchIncidents: function(){
-    // var url = 'http://127.0.0.1:5000/api/incidents/?status=active'
-    var url = 'https://street-witness.herokuapp.com/api/incidents/?status=active'
+    var url = 'http://127.0.0.1:5000/api/incidents/?status=active'
+    // var url = 'https://street-witness.herokuapp.com/api/incidents/?status=active'
     var incidents
 
     $.ajax({
