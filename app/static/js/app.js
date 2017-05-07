@@ -174,14 +174,15 @@ var FormModal = React.createClass({
   handleSubmit: function(event){
     event.preventDefault()
 
-    // var url = 'http://127.0.0.1:5000/api/incidents/'
-    var url = 'https://street-witness.herokuapp.com/api/incidents/'
+    var url = 'http://127.0.0.1:5000/api/incidents/'
+    // var url = 'https://street-witness.herokuapp.com/api/incidents/'
 
     fetch(url, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
+        'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjE0LCJpYXQiOjE0OTM3MjI2OTAsImV4cCI6MTQ5MzgwOTA5MCwicm9sZSI6IlVzZXIifQ.yYNeCtWUxFEhx2lXx4dVgF8T0sH7KAx8HQMBXRbOM44',
       },
       body: JSON.stringify(this.state)
     }).then(function(response){
@@ -300,6 +301,9 @@ var App = React.createClass({
 
     $.ajax({
       url: url,
+      headers: {
+        'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjE0LCJpYXQiOjE0OTM3MjI2OTAsImV4cCI6MTQ5MzgwOTA5MCwicm9sZSI6IlVzZXIifQ.yYNeCtWUxFEhx2lXx4dVgF8T0sH7KAx8HQMBXRbOM44'
+      },
       dataType: 'json',
       cache: false,
       success: function(data){

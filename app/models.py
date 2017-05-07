@@ -15,11 +15,13 @@ class Incident(db.Model):
     location = db.Column('location', JSON)
     status = db.Column('status', db.Unicode)
     # tag = db.Column('tag', db.Unicode)
+    reporter = db.Column(db.Integer, db.ForeignKey('users.id'), default=None)
 
-    def __init__(self, title="", description="", location={}):
+    def __init__(self, title="", description="", location={}, reporter=None):
         self.title = title
         self.description = description
         self.location = location
+        self.reporter = reporter
         self.timestamp = datetime.utcnow().replace(microsecond=0) + \
                                                              timedelta(hours=3)
         self.status = 'active'
@@ -39,6 +41,10 @@ class User(db.Model):
     registered_on = db.Column('registered_on', db.DateTime, nullable=False)
     admin = db.Column('admin' ,db.Boolean, nullable=False, default=False)
 
+    user_reporter = db.relationship('Incident',
+                                    backref='incident_reporter',
+                                    foreign_keys='Incident.reporter')
+
     def __init__(self, username, password, admin=False):
         self.username = username
         self.password = bcrypt.generate_password_hash(password).decode()
@@ -49,7 +55,7 @@ class User(db.Model):
     def __repr__(self):
         return '<User obj. Username: {}>'.format(self.username)
 
-    def encode_auth_token(self, user_id):
+    def encode_auth_token(self, user_id, user_role):
         """
         Generates the Auth Token
         :return: string
@@ -58,7 +64,8 @@ class User(db.Model):
             payload = {
                 'exp': datetime.utcnow() + timedelta(days=1),
                 'iat': datetime.utcnow(),
-                'sub': user_id
+                'sub': user_id,
+                'role': user_role
             }
             return jwt.encode(
                 payload,
@@ -74,7 +81,7 @@ class User(db.Model):
         """
         Validates the auth token
         :param auth_token:
-        :return: integer|string
+        :return: dictionary | string
         """
         try:
             payload = jwt.decode(auth_token, app.config.get('SECRET_KEY'))
@@ -82,7 +89,8 @@ class User(db.Model):
             if is_blacklisted_token:
                 return 'Token blacklisted. Please log in again.'
             else:
-                return payload['sub']
+                user_data = {'user': payload['sub'], 'role': payload['role']}
+                return user_data
         except jwt.ExpiredSignatureError:
             return 'Signature expired. Please log in again.'
         except jwt.InvalidTokenError:
