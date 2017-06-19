@@ -61,7 +61,8 @@ def object_to_json(object):
     object['url'] = url_for('incidents_api',
                             incident_id=object.pop('id'),
                             _external=True)
-    user = models.User.query.get(object['reporter'])
-    object['reporter'] = user.username
+    if reporter in object.keys():
+        user = models.User.query.get(object['reporter'])
+        object['reporter'] = user.username
 
     return object
