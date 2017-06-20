@@ -17,6 +17,8 @@ class Incident(db.Model):
     # tag = db.Column('tag', db.Unicode)
     reporter = db.Column(db.Integer, db.ForeignKey('users.id'), default=None)
 
+    files = db.relationship('File', backref='incident')
+
     def __init__(self, title="", description="", location={}, reporter=None):
         self.title = title
         self.description = description
@@ -29,6 +31,25 @@ class Incident(db.Model):
 
     def __repr__(self):
         return '<Incident obj. Title: {}>'.format(self.title)
+
+
+class File(db.Model):
+    """Model for files storage paths"""
+    __tablename__ = 'files'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    path = db.Column(db.String(200))
+    uploaded_on = db.Column(db.DateTime)
+
+    incident_id = db.Column(db.Integer, db.ForeignKey('incidents.id'))
+
+    def __init__(self, path="", incident_id=None):
+        self.path = path
+        self.uploaded_on = datetime.now()
+        self.incident_id = incident_id
+
+    def __repr__(self):
+        return '<File: {}>'.format(self.path)
 
 
 class User(db.Model):
