@@ -1,5 +1,6 @@
 
 import jwt
+from flask import url_for
 from app import db, bcrypt, app
 from sqlalchemy.dialects.postgresql import JSON
 from datetime import datetime, timedelta
@@ -26,11 +27,25 @@ class Incident(db.Model):
         self.reporter = reporter
         self.timestamp = datetime.utcnow().replace(microsecond=0) + \
                                                              timedelta(hours=3)
-        self.status = 'active'
+        self.status = 'pending'
         # self.tag = ''
 
     def __repr__(self):
         return '<Incident obj. Title: {}>'.format(self.title)
+
+
+    def __serialize__(self):
+        files = []
+        if self.files:
+            files = [file.path for file in self.files]
+        return {"url": url_for('incidents_api',
+                               incident_id=self.id,
+                               _external=True),
+                "title": self.title,
+                "description": self.description,
+                "location": self.location,
+                "reporter": self.incident_reporter.username,
+                "files": files}
 
 
 class File(db.Model):

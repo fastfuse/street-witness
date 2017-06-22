@@ -56,7 +56,14 @@ def login_required(func):
 
 def object_to_json(object):
     """ Convert DB object to RESTful json format (without unnecessary stuff) """
+
+    print(dir(object))
+    print()
+
     object = object.__dict__
+
+    print(object)
+
     object.pop('_sa_instance_state')
     object['url'] = url_for('incidents_api',
                             incident_id=object.pop('id'),

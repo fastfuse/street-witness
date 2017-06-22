@@ -32,6 +32,7 @@ class UserView(ModelView):
 
 
 admin.add_view(IncidentsView(models.Incident, db.session))
+admin.add_view(ModelView(models.File, db.session))
 admin.add_view(UserView(models.User, db.session))
 admin.add_view(ModelView(models.BlacklistToken, db.session))
 
@@ -55,7 +56,7 @@ class IncidentsAPI(MethodView):
         """ Get all incidents or single incident by ID """
         if incident_id:
             incident_query = models.Incident.query.get_or_404(incident_id)
-            incident = utils.object_to_json(incident_query)
+            incident = incident_query.__serialize__()
 
             return make_response(jsonify(incident))
 
@@ -70,24 +71,29 @@ class IncidentsAPI(MethodView):
 
             incidents = []
             for item in incidents_query:
-                incidents.append(utils.object_to_json(item))
+                incidents.append(item.__serialize__())
 
-            return make_response(jsonify(incidents=incidents, 
+            return make_response(jsonify(incidents=incidents,
                                          count=len(incidents)))
 
     def post(self, **kwargs):
         """ Add new incident """
         post_data = request.get_json()
-        new_incident = models.Incident(post_data['title'],
-                                       post_data['description'],
-                                       post_data['location'],
-                                       kwargs['user'].id)
-
-        response = copy.deepcopy(new_incident.__dict__) # refactor as generic function
-        response.pop('_sa_instance_state')
-
+        new_incident = models.Incident(title=post_data['title'],
+                                       description=post_data['description'],
+                                       location=post_data['location'],
+                                       reporter=kwargs['user'].id)
         db.session.add(new_incident)
         db.session.commit()
+
+        if 'files' in post_data.keys():
+            for path in post_data['files']:
+                new_file = models.File(path=path, incident_id=new_incident.id)
+                db.session.add(new_file)
+
+        db.session.commit()   # avoid commit 2 times
+
+        response = new_incident.__serialize__()
 
         return make_response(jsonify(response), 201)
 
@@ -160,26 +166,6 @@ class LoginAPI(MethodView):
             print(e)
             response = utils.Response('Fail', 'Try again')
             return make_response(jsonify(response._asdict())), 500
-
-
-# class UserAPI(MethodView):
-#     """ User Resource """
-
-#     decorators = [login_required]
-
-#     def get(self, id, **kwargs):
-
-#         user = kwargs['user']
-#         response_object = {
-#             'status': 'Success',
-#             'data': {
-#                 'user_id': user.id,
-#                 'username': user.username,
-#                 'admin': user.admin,
-#                 'registered_on': user.registered_on
-#             }
-#         }
-#         return make_response(jsonify(response_object)), 200
 
 
 class LogoutAPI(MethodView):
