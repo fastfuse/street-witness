@@ -233,3 +233,4 @@ app.add_url_rule('/api/incidents/',
 app.add_url_rule('/api/incidents/<int:incident_id>',
                  view_func=incidents_view,
                  methods=['GET', 'PUT', 'DELETE'])
+
