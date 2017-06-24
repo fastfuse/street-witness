@@ -31,10 +31,10 @@ class Incident(db.Model):
         # self.tag = ''
 
     def __repr__(self):
-        return '<Incident obj. Title: {}>'.format(self.title)
+        return '<Incident object. Title: {}>'.format(self.title)
 
 
-    def __serialize__(self):
+    def serialize(self):
         files = []
         if self.files:
             files = [file.path for file in self.files]
@@ -44,6 +44,7 @@ class Incident(db.Model):
                 "title": self.title,
                 "description": self.description,
                 "location": self.location,
+                "timestamp": self.timestamp,
                 "reporter": self.incident_reporter.username,
                 "files": files}
 
@@ -64,7 +65,7 @@ class File(db.Model):
         self.incident_id = incident_id
 
     def __repr__(self):
-        return '<File: {}>'.format(self.path)
+        return '<File object. Path: {}>'.format(self.path)
 
 
 class User(db.Model):
@@ -89,7 +90,7 @@ class User(db.Model):
         self.admin = admin
 
     def __repr__(self):
-        return '<User obj. Username: {}>'.format(self.username)
+        return '<User object. Username: {}>'.format(self.username)
 
     def encode_auth_token(self, user_id, user_role):
         """
@@ -97,17 +98,13 @@ class User(db.Model):
         :return: string
         """
         try:
-            payload = {
-                'exp': datetime.utcnow() + timedelta(days=1),
-                'iat': datetime.utcnow(),
-                'sub': user_id,
-                'role': user_role
-            }
-            return jwt.encode(
-                payload,
-                app.config.get('SECRET_KEY'),
-                algorithm='HS256'
-            )
+            payload = {'exp': datetime.utcnow() + timedelta(days=1),
+                       'iat': datetime.utcnow(),
+                       'sub': user_id,
+                       'role': user_role}
+
+            return jwt.encode(payload, app.config.get('SECRET_KEY'),
+                              algorithm='HS256')
 
         except Exception as e:
             return e
@@ -151,8 +148,8 @@ class BlacklistToken(db.Model):
     @staticmethod
     def check_blacklist(auth_token):
         # check whether auth token has been blacklisted
-        res = BlacklistToken.query.filter_by(token=str(auth_token)).first()
-        if res:
+        result = BlacklistToken.query.filter_by(token=str(auth_token)).first()
+        if result:
             return True
         else:
             return False

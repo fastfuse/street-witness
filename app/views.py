@@ -3,12 +3,7 @@
 
 import copy
 from app import app, db, admin, models, bcrypt, utils
-from flask import (request,
-                   redirect,
-                   render_template,
-                   make_response,
-                   url_for,
-                   jsonify)
+from flask import request, render_template, make_response, jsonify
 from flask.views import MethodView
 from datetime import datetime
 from flask_admin.contrib.sqla import ModelView
@@ -18,7 +13,9 @@ from wtforms import fields
 # ============================   Admin views   ================================
 
 class IncidentsView(ModelView):
-    form_choices = {'status': [('active', 'Активний'),
+    """Overwrites model view to make admin more useful"""
+    form_choices = {'status': [('pending', 'Очікує'),
+                               ('active', 'Активний'),
                                ('archived', 'Архів')]}
 
     form_overrides = {'description': fields.TextAreaField}
@@ -56,7 +53,7 @@ class IncidentsAPI(MethodView):
         """ Get all incidents or single incident by ID """
         if incident_id:
             incident_query = models.Incident.query.get_or_404(incident_id)
-            incident = incident_query.__serialize__()
+            incident = incident_query.serialize()
 
             return make_response(jsonify(incident))
 
@@ -71,7 +68,7 @@ class IncidentsAPI(MethodView):
 
             incidents = []
             for item in incidents_query:
-                incidents.append(item.__serialize__())
+                incidents.append(item.serialize())
 
             return make_response(jsonify(incidents=incidents,
                                          count=len(incidents)))
@@ -91,7 +88,7 @@ class IncidentsAPI(MethodView):
                 new_file = models.File(path=path, incident_id=new_incident.id)
                 db.session.add(new_file)
 
-        db.session.commit()   # avoid commit 2 times
+        db.session.commit()   # avoid commiting 2 times
 
         response = new_incident.__serialize__()
 
@@ -233,4 +230,3 @@ app.add_url_rule('/api/incidents/',
 app.add_url_rule('/api/incidents/<int:incident_id>',
                  view_func=incidents_view,
                  methods=['GET', 'PUT', 'DELETE'])
-

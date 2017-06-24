@@ -5,8 +5,10 @@ from collections import namedtuple
 
 
 def register_api(view, endpoint, url, pk='id', pk_type='any'):
-    """ Function to simplify registration
-        of API Views (based on MethodView) """
+    """
+    Function to simplify registration of API Views (based on MethodView)
+    Deprecated
+    """
     view_func = view.as_view(endpoint)
     app.add_url_rule(url, defaults={pk: None},
                      view_func=view_func, methods=['GET',])
@@ -28,8 +30,10 @@ def not_found(error):
 
 
 def login_required(func):
-    """ Login required decorator.
-        Additionally gives access to User object inside decorated view """
+    """
+    Login required decorator.
+    Additionally gives access to User object inside decorated view
+    """
     def wrapper(*args, **kwargs):
         auth_header = request.headers.get('Authorization')
         if auth_header:
@@ -55,15 +59,11 @@ def login_required(func):
 
 
 def object_to_json(object):
-    """ Convert DB object to RESTful json format (without unnecessary stuff) """
-
-    print(dir(object))
-    print()
-
+    """
+    Convert DB object to RESTful json format (without unnecessary stuff)
+    Deprecated! Use models.Incident.serialize() instead
+    """
     object = object.__dict__
-
-    print(object)
-
     object.pop('_sa_instance_state')
     object['url'] = url_for('incidents_api',
                             incident_id=object.pop('id'),
