@@ -38,7 +38,7 @@ class Incident(db.Model):
         files = []
         if self.files:
             files = [file.path for file in self.files]
-        return {"url": url_for('incidents_api',
+        return {"url": url_for('api_blueprint.incidents_api',
                                incident_id=self.id,
                                _external=True),
                 "title": self.title,

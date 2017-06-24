@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 import os
 from flask import Flask
@@ -16,5 +17,16 @@ db = SQLAlchemy(app)
 admin = Admin(app)
 
 
-from app import views
+from .admin import admin_blueprint
+from .auth import auth_blueprint
+from .api import api_blueprint
+from .dashboard import dashboard_blueprint
+
+
+app.register_blueprint(admin_blueprint)
+app.register_blueprint(auth_blueprint)
+app.register_blueprint(api_blueprint)
+app.register_blueprint(dashboard_blueprint)
+
+
 from app import models
