@@ -90,9 +90,9 @@ class IncidentsAPI(MethodView):
 
         db.session.commit()   # avoid commiting 2 times
 
-        response = new_incident.__serialize__()
+        response = new_incident.serialize()
 
-        return make_response(jsonify(response), 201)
+        return make_response(jsonify(response)), 201
 
 
 class RegistrationAPI(MethodView):
