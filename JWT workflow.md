@@ -2,13 +2,13 @@
 
 Endpoints:
 
-* /api/register
-* /api/login
-* /api/logout
+* /auth/register
+* /auth/login
+* /auth/logout
 
 Request:
 
-    POST /api/register
+    POST /auth/register
     HEADERS: content-type: application/json
     BODY: {"username":"user1","password":"user1"}
 
@@ -23,7 +23,7 @@ Response:
 
 Request:
 
-    POST /api/login
+    POST /auth/login
     HEADERS: content-type: application/json
     BODY: {"username":"user1","password":"user1"}
 
@@ -38,7 +38,7 @@ Response:
 
 Request:
 
-    GET /api/incidents
+    GET /api/incidents/
     HEADERS: content-type: application/json, Authorization: "Bearer <auth_token>"
 
 Response:
@@ -51,7 +51,7 @@ Response:
 
 Request:
 
-    POST /api/logout
+    POST /auth/logout
     HEADERS: content-type: application/json, Authorization: "Bearer <auth_token>"
 
 Response:
