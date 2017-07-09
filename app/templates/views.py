@@ -8,7 +8,7 @@ from app import db, models, bcrypt, utils
 @dashboard_blueprint.route('/')
 @dashboard_blueprint.route('/map')
 def index():
-    """ Only renders index (map) page """
+    """ Only renders dashboard (index) page """
     return render_template('index.html')
 
 
